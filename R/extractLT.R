@@ -47,12 +47,13 @@
 #'   dispformula=~0+Cultivar/splines::ns(dose,2),
 #'   data=subset(codling1989,dose>0))
 #' round(qra::extractLT(codling1989.TMB, a=1:3, 4:6),1)
-
+#'
 #' @export
 #'
 #' @importFrom stats coef vcov family
 #' @importFrom lme4 fixef
 #' @importFrom splines ns
+#' @importFrom glmmTMB glmmTMB
 #
 #' @rdname extractLT
 #' @export

@@ -90,4 +90,5 @@ codling1989.TMB <- glmmTMB::glmmTMB(formula=form,
   dispformula=~0+Cultivar/splines::ns(dose,2),
   data=subset(codling1989,dose>0))
 round(qra::extractLT(codling1989.TMB, a=1:3, 4:6),1)
+
 }
