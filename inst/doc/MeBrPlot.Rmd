@@ -13,6 +13,13 @@ vignette: >
 library(qra, quietly=TRUE)
 ```
 
+```{r echo=FALSE}
+pkg <- "glmmTMB"
+pcheck <- suppressWarnings(requireNamespace(pkg, quietly = TRUE))
+if(pcheck) pcheck & packageVersion("glmmTMB") >= "1.1.2"
+noglmmTMB <- !pcheck
+```
+
 ## Plot data
 
 # Plot 1988 and 1989 data separately
@@ -33,6 +40,8 @@ qra::graphSum(df=qra::codling1989, link="cloglog", logScale=FALSE,
                      maint="1989: Codling moth, MeBr",
                      xlab=expression(bold("CT ")*"(gm.h."*m^{-3}*")"))
 ```
+
+
 
 ## Correct for control mortality
 
@@ -57,6 +66,14 @@ cod89$cm <- cm89[cmMatch,'PropDead']
 cod89$apobs <- with(cod89, (PropDead-cm)/(1-cm))
 xyplot(cloglog(apobs)~ct|Cultivar, groups=rep, data=cod89, layout=c(3,1),
        maint="1989: Codling moth, MeBr")
+```
+
+```{r noglmmTMB, echo=FALSE}
+if (noglmmTMB) {
+  message(" This vignette requires a version of `glmmTMB` >= 1.1.2")
+  message(" Earlier versions of `glmmTMB` may have issues\n for matching versions of `TMB` and `Matrix`")
+knit_exit()
+}
 ```
 
 We now check the consistency of control mortality estimates

@@ -1,6 +1,12 @@
 ## ----linkfun, message=FALSE---------------------------------------------------
 library(qra, quietly=TRUE)
 
+## ----echo=FALSE---------------------------------------------------------------
+pkg <- "glmmTMB"
+pcheck <- suppressWarnings(requireNamespace(pkg, quietly = TRUE))
+if(pcheck) pcheck & packageVersion("glmmTMB") >= "1.1.2"
+noglmmTMB <- !pcheck
+
 ## ----y1988, fig.width=8, fig.height=2.5,  out.width='100%'--------------------
 qra::graphSum(df=qra::codling1988, link="cloglog", logScale=FALSE,
                      dead="dead", tot="total", dosevar="ct", Rep="rep",
@@ -37,6 +43,13 @@ cod89$cm <- cm89[cmMatch,'PropDead']
 cod89$apobs <- with(cod89, (PropDead-cm)/(1-cm))
 xyplot(cloglog(apobs)~ct|Cultivar, groups=rep, data=cod89, layout=c(3,1),
        maint="1989: Codling moth, MeBr")
+
+## ----noglmmTMB, echo=FALSE----------------------------------------------------
+if (noglmmTMB) {
+  message(" This vignette requires a version of `glmmTMB` >= 1.1.2")
+  message(" Earlier versions of `glmmTMB` may have issues\n for matching versions of `TMB` and `Matrix`")
+knit_exit()
+}
 
 ## ----cm-----------------------------------------------------------------------
 ctl <- glmmTMB::glmmTMBControl(optimizer=optim,

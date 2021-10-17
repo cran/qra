@@ -20,15 +20,14 @@ theme <- list(axis.line = list(alpha = 1, col = 'gray40',
               fontsize = list(text = 10, points = 6))
 
 ## ----echo=FALSE-----------------------------------------------------
+if("lme4" %in% (.packages()))
+  detach("package:lme4", unload=TRUE)
 req_suggested_packages <- c("gamlss")
-pcheck <- !unlist(lapply(req_suggested_packages, requireNamespace, 
-                 quietly = TRUE))
-nogamlss <- any(pcheck)
-noneMiss <- !any(pcheck)
+noneMiss <- suppressMessages(requireNamespace('gamlss', quietly = TRUE))
+nogamlss <- !noneMiss
 if (nogamlss) {
-   message("This vignette requires one or more package(s) that are not available/installed: ")
-message(paste(req_suggested_packages[!pcheck],collapse=","))
-message("Code that requires these packages will not be executed.")
+   message("This vignette requires the `gamlss` package, that is not available/installed.")
+message("Code that requires this package will not be executed.")
 }
 
 ## ---- include = FALSE-------------------------------------------------------------------
@@ -36,6 +35,7 @@ op <- options(width=90)
 knitr::opts_chunk$set(
   collapse = TRUE
 )
+
 
 ## ----binom-dp, echo=FALSE---------------------------------------------------------------
 binom <- rbind(
@@ -268,7 +268,7 @@ htab
 #    sapply(split(qra::kerrich,
 #                 rep(1:200,rep(10,200))),sum), levels=0:10),
 #    dnn=list("A: Frequency of each of 0 to 10, in 10 tosses"))
-#  tastab <- table(factor(qra::ray_blight, levels=0:6),
+#  tastab <- table(factor(qra::rayBlight, levels=0:6),
 #                  dnn=list("B: Frequency of each of 0 to 6, in 6 plants"))
 
 ## ----tastab, echo=FALSE-----------------------------------------------------------------
@@ -279,7 +279,7 @@ tastab
 #    sapply(split(qra::kerrich,
 #                 rep(1:200,rep(10,200))),sum), levels=0:10),
 #    dnn=list("A: Frequency of each of 0 to 10, in 10 tosses"))
-#  tastab <- table(factor(qra::ray_blight, levels=0:6),
+#  tastab <- table(factor(qra::rayBlight, levels=0:6),
 #                  dnn=list("B: Frequency of each of 0 to 6, in 6 plants"))
 
 ## ----cfFits, message=FALSE, echo=TRUE, eval=noneMiss------------------------------------

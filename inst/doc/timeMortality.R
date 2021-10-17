@@ -31,6 +31,16 @@ qra::graphSum(df=HawCon, link="cloglog", logScale=FALSE,
          byFacet=~trtGp, layout=LifestageTrt~Species,
          xlab="Days", maint="Hawaian contemporary data")
 
+## ----echo=FALSE---------------------------------------------------------------
+pkg <- "glmmTMB"
+pcheck <- suppressWarnings(requireNamespace(pkg, quietly = TRUE))
+if(pcheck) pcheck & packageVersion("glmmTMB") >= "1.1.2"
+if(!pcheck){
+  message("`glmmTMB` version >= 1.1.2 is not available")
+  message("Will not continue execution of vignette")
+  knit_exit()
+  }
+
 ## ----glmmTMB-altFits, message=FALSE, warning=FALSE, echo=FALSE----------------
 if("VGAM" %in% (.packages()))
   detach("package:VGAM", unload=TRUE)
@@ -75,17 +85,8 @@ clog <- make.link('cloglog')$linkfun
 logit <- make.link('logit')$linkfun
 cloginv <- make.link('cloglog')$linkinv
 logitinv <- make.link('logit')$linkinv
-my.panel.bands <- function(x, y, upper, lower, fill, col,
-                           subscripts, ..., font, fontface)
-{
-  upper <- upper[subscripts]
-  lower <- lower[subscripts]
-  panel.lines(x,lower, ...)
-  panel.lines(x,upper, ...)
-}
 panel2 <- function(x, y, ...){
   panel.superpose(x, y, 
-                  ## panel.groups = my.panel.bands, 
                   type='l', ...)
   panel.xyplot(x, y, type='l', lwd=2, cex=0.6, ...)
 }
@@ -112,24 +113,17 @@ gph <- xyplot(diff~TrtTime|link, outer=TRUE, data=dat, groups=trtGp,
               auto.key=list(text=levels(HawCon$trtGp), columns=4, points=FALSE, lines=TRUE), 
               par.settings=parset, layout=c(2,1), 
               scales=list(x=list(at=c(2,6,10,14)), 
-              y=list(relation='free'), alternating=c(1,1)))
-gph2 <- update(gph, strip=strip.custom(factor.levels=
+              y=list(relation='free'), alternating=c(1,1)),
+              strip=strip.custom(factor.levels=
             c("A: Complementary log-log link", "B: Logit link")))
-# parset3 <- simpleTheme(col=rep(1:4,rep(2,4)), lty=rep(2, 8), lwd=rep(2:1,4), alpha=0.35)
-# gph3 <- xyplot(fit2~TrtTime|link, outer=TRUE, data=dat, groups=trtGp,
-#               ## upper = dat$upr, lower = dat$lwr, 
-#              panel = panel2, par.settings=parset3, layout=c(2,1))
-gph2 
+gph
 
 ## ----echo=FALSE---------------------------------------------------------------
-req_suggested_packages <- c("DHARMa")
-pcheck <- !unlist(lapply(req_suggested_packages, requireNamespace, 
-                 quietly = TRUE))
-yesDHARMa <- !any(pcheck)
+pcheck <- suppressMessages(requireNamespace('DHARMa', quietly = TRUE))
+yesDHARMa <- pcheck
 if (!yesDHARMa) {
-   message("This vignette requires one or more package(s) that are not available/installed: ")
-message(paste(req_suggested_packages[!pcheck],collapse=","))
-message("Code that requires these packages will not be executed.")
+   message("The suggested package `DHARMa` is not available/installed.")
+message("Code that requires this package will not be executed.")
 }
 
 ## ----cap3, echo=FALSE---------------------------------------------------------
@@ -382,11 +376,10 @@ LTbin.cll <-
 rownames(LTbin.cll) <- shorten(rownames(LTbin.cll))
 
 ## ----OKplotrix-plotCI---------------------------------------------------------
-OKplotrix <- requireNamespace("plotrix", quietly = TRUE)
+OKplotrix <- suppressWarnings(requireNamespace("plotrix", quietly = TRUE))
 if (!OKplotrix) {
-   message("This vignette requires a package not available/installed: ")
-message("plotrix")
-message("Code that requires this package will not be executed.")
+   message("The `plotix' package is not available/installed.")
+message("Code that requires the `plotix' package will not be executed.")
 }
 
 ## ----cap9, echo=FALSE---------------------------------------------------------
@@ -512,21 +505,21 @@ sim <- DHARMa::simulateResiduals(HCgauss.cll)
 DHARMa::plotResiduals(sim)
 
 ## ----cap12, echo=FALSE--------------------------------------------------------
-cap12 <- "Comparison of estimates and
-upper and lower $95\\%$ confidence limits, between the 
-preferred betabinomial complementary log-log model and this
-model."
+cap12 <- "Comparison of estimates and upper and lower $95\\%$ 
+confidence limits, between the preferred betabinomial 
+complementary log-log model (BB) and the gaussian error model."
 
 ## ----BBvsGauss, out.width="100%",  message=FALSE, echo=FALSE------------------
 cfLTs <- cbind(LTbb.cll, LTgauss.cll)
-colnames(cfLTs) <- c(rep('bb',3),rep('gauss',3))
+colnames(cfLTs) <- c(rep('BB',3),rep('gauss',3))
 tab <- round(cfLTs[,c(c(1,4),c(1,4)+1,c(1,4)+2)],1)
-if(require(kableExtra)){
-linesep <- c('', '\\addlinespace') 
-knitr::kable(tab, booktabs=TRUE, linesep=linesep, format='latex', caption=cap12, 
-             format.args=list(justify="right", width=9)) |>
-  kable_styling(latex_options = "striped", stripe_index = 5:8, font_size=9, full_width=FALSE) |>
-  column_spec(6:7, bold=TRUE) %>%
-  add_header_above(c(' '=1,'Estimate'=2,'Lower'=2, 'Upper'=2), align='r') 
+pcheck <- suppressWarnings(requireNamespace("kableExtra", quietly = TRUE))
+if(pcheck) pcheck & packageVersion("kableExtra") >= "1.2"
+if(pcheck){
+kableExtra::kbl(tab, font_size=9, caption=cap12) |>
+  kableExtra::kable_paper("striped", full_width=FALSE) |>
+  kableExtra::column_spec(6:7, bold=TRUE) |>
+  kableExtra::row_spec(5:8, color='blue', bold=T) |>
+  kableExtra::add_header_above(c(' '=1,'Estimate'=2,'Lower'=2, 'Upper'=2), align='c') 
 } else print(tab)
 

@@ -26,7 +26,7 @@ and \code{getScaleCoef}.
 See \code{\link{fpower}}.
 
 \code{extractLT}: Obtains complete set of LT or LD estimate, when it is
-convenient to get results from several models at the same time.
+convenient to get results from several models at the same time.
 
 \code{foldp}: Calculates the ratio of \code{p+eps} to \code{1-code+eps}
 
@@ -54,4 +54,8 @@ of comparison, to make it easy to show how poor the approximation
 can be, and to warn against its general dewvuse!
 }
 
+\author{
+\strong{Maintainer}: John Maindonald \email{john@statsresearch.co.nz} (\href{https://orcid.org/0000-0002-0106-9224}{ORCID})
+
+}
 \keyword{internal}

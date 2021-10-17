@@ -31,15 +31,14 @@ read_chunk("discrete-code.R")
 ```{r set-lattice, echo=FALSE}
 ```
 ```{r echo=FALSE}
+if("lme4" %in% (.packages()))
+  detach("package:lme4", unload=TRUE)
 req_suggested_packages <- c("gamlss")
-pcheck <- !unlist(lapply(req_suggested_packages, requireNamespace, 
-                 quietly = TRUE))
-nogamlss <- any(pcheck)
-noneMiss <- !any(pcheck)
+noneMiss <- suppressMessages(requireNamespace('gamlss', quietly = TRUE))
+nogamlss <- !noneMiss
 if (nogamlss) {
-   message("This vignette requires one or more package(s) that are not available/installed: ")
-message(paste(req_suggested_packages[!pcheck],collapse=","))
-message("Code that requires these packages will not be executed.")
+   message("This vignette requires the `gamlss` package, that is not available/installed.")
+message("Code that requires this package will not be executed.")
 }
 ```
 
@@ -48,6 +47,7 @@ op <- options(width=90)
 knitr::opts_chunk$set(
   collapse = TRUE
 )
+
 ```
 
 <!-- https://lbusett.netlify.app/post/building-a-website-with-pkgdown-a-short-guide/ -->

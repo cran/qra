@@ -190,7 +190,7 @@ htab <- table(factor(
   sapply(split(qra::kerrich,
                rep(1:200,rep(10,200))),sum), levels=0:10),
   dnn=list("A: Frequency of each of 0 to 10, in 10 tosses"))
-tastab <- table(factor(qra::ray_blight, levels=0:6),
+tastab <- table(factor(qra::rayBlight, levels=0:6),
                 dnn=list("B: Frequency of each of 0 to 6, in 6 plants"))
 
 ## ---- binAB ----

@@ -6,8 +6,6 @@ documentclass: article
 classoption: b5paper
 fontsize: 10pt
 output:
-  bookdown::pdf_book:
-    keep_tex: yes
   bookdown::html_document2:
     theme: cayman
     highlight: vignette
@@ -232,6 +230,17 @@ with $n$.  This is an important difference.
 Figure \@ref(fig:glmmTMB-altFits-gph1)  shows lines and curves
 from alternative models that have been fitted to the data.
 
+```{r echo=FALSE}
+pkg <- "glmmTMB"
+pcheck <- suppressWarnings(requireNamespace(pkg, quietly = TRUE))
+if(pcheck) pcheck & packageVersion("glmmTMB") >= "1.1.2"
+if(!pcheck){
+  message("`glmmTMB` version >= 1.1.2 is not available")
+  message("Will not continue execution of vignette")
+  knit_exit()
+  }
+```
+
 ```{r glmmTMB-altFits, message=FALSE, warning=FALSE, echo=FALSE}
 if("VGAM" %in% (.packages()))
   detach("package:VGAM", unload=TRUE)
@@ -327,24 +336,14 @@ Panel A is for the models that use a complementary log-log
 (cloglog) link, while Panel B is for a logit link."
 ```
 
-
 ```{r glmmTMB-altFits-gph1, fig.width=9, fig.height=4.0, fig.show='hold', top=2, out.width="100%",  fig.align='center', message=FALSE, warning=0, fig.cap=cap7, echo=FALSE}
 library(lattice)
 clog <- make.link('cloglog')$linkfun
 logit <- make.link('logit')$linkfun
 cloginv <- make.link('cloglog')$linkinv
 logitinv <- make.link('logit')$linkinv
-my.panel.bands <- function(x, y, upper, lower, fill, col,
-                           subscripts, ..., font, fontface)
-{
-  upper <- upper[subscripts]
-  lower <- lower[subscripts]
-  panel.lines(x,lower, ...)
-  panel.lines(x,upper, ...)
-}
 panel2 <- function(x, y, ...){
   panel.superpose(x, y, 
-                  ## panel.groups = my.panel.bands, 
                   type='l', ...)
   panel.xyplot(x, y, type='l', lwd=2, cex=0.6, ...)
 }
@@ -371,14 +370,10 @@ gph <- xyplot(diff~TrtTime|link, outer=TRUE, data=dat, groups=trtGp,
               auto.key=list(text=levels(HawCon$trtGp), columns=4, points=FALSE, lines=TRUE), 
               par.settings=parset, layout=c(2,1), 
               scales=list(x=list(at=c(2,6,10,14)), 
-              y=list(relation='free'), alternating=c(1,1)))
-gph2 <- update(gph, strip=strip.custom(factor.levels=
+              y=list(relation='free'), alternating=c(1,1)),
+              strip=strip.custom(factor.levels=
             c("A: Complementary log-log link", "B: Logit link")))
-# parset3 <- simpleTheme(col=rep(1:4,rep(2,4)), lty=rep(2, 8), lwd=rep(2:1,4), alpha=0.35)
-# gph3 <- xyplot(fit2~TrtTime|link, outer=TRUE, data=dat, groups=trtGp,
-#               ## upper = dat$upr, lower = dat$lwr, 
-#              panel = panel2, par.settings=parset3, layout=c(2,1))
-gph2 
+gph
 ```
 
 ## Diagnostic checks 
@@ -423,14 +418,11 @@ and check whether there is a difference of substance in the
 fitted values and parameter estimates.
 
 ```{r echo=FALSE}
-req_suggested_packages <- c("DHARMa")
-pcheck <- !unlist(lapply(req_suggested_packages, requireNamespace, 
-                 quietly = TRUE))
-yesDHARMa <- !any(pcheck)
+pcheck <- suppressMessages(requireNamespace('DHARMa', quietly = TRUE))
+yesDHARMa <- pcheck
 if (!yesDHARMa) {
-   message("This vignette requires one or more package(s) that are not available/installed: ")
-message(paste(req_suggested_packages[!pcheck],collapse=","))
-message("Code that requires these packages will not be executed.")
+   message("The suggested package `DHARMa` is not available/installed.")
+message("Code that requires this package will not be executed.")
 }
 ```
 
@@ -531,30 +523,6 @@ sim250 <- DHARMa::simulateResiduals(sim.TMB)
 DHARMa::plotQQunif(sim250)
 DHARMa::plotResiduals(sim250)
 ```
-
-<!-- Alternatives shown, for both the complementary log-log and logit links, are: -->
-
-<!-- * Separate lines for each treatment group;   -->
-<!-- * Separate lines for each treatment group, plus a 2-degree -->
-<!-- polynomial function of time in cold storage that applies a common -->
-<!-- adjustment across all treatment groups. (For this ``added -->
-<!-- curve'' model, the suffix "2s" is added to the model name.) -->
-
-<!-- The quadratic curves are shown, in Figure \@ref(fig:glmmTMB-altFits-gph), -->
-<!-- in attenuated colors.  In Panel A, these appear remarkably close to -->
-<!-- straight lines.  There are much larger differences in Panel B.  -->
-
-<!-- Alternatives shown, for both the complementary log-log and logit links, are: -->
-
-<!-- * Separate lines for each treatment group;   -->
-<!-- * Separate lines for each treatment group, plus a 2-degree -->
-<!-- polynomial function of time in cold storage that applies a common -->
-<!-- adjustment across all treatment groups. (For this ``added -->
-<!-- curve'' model, the suffix "2s" is added to the model name.) -->
-
-<!-- The quadratic curves are shown, in Figure \@ref(fig:glmmTMB-altFits-gph), -->
-<!-- in attenuated colors.  In Panel A, these appear remarkably close to -->
-<!-- straight lines.  There are much larger differences in Panel B.  -->
 
 ### AIC-based model comparisons {-}
 
@@ -905,11 +873,10 @@ rownames(LTbin.cll) <- shorten(rownames(LTbin.cll))
 ```
 
 ```{r OKplotrix-plotCI}
-OKplotrix <- requireNamespace("plotrix", quietly = TRUE)
+OKplotrix <- suppressWarnings(requireNamespace("plotrix", quietly = TRUE))
 if (!OKplotrix) {
-   message("This vignette requires a package not available/installed: ")
-message("plotrix")
-message("Code that requires this package will not be executed.")
+   message("The `plotix' package is not available/installed.")
+message("Code that requires the `plotix' package will not be executed.")
 }
 ```
 
@@ -1117,23 +1084,23 @@ DHARMa::plotResiduals(sim)
 ```
 
 ```{r cap12, echo=FALSE}
-cap12 <- "Comparison of estimates and
-upper and lower $95\\%$ confidence limits, between the 
-preferred betabinomial complementary log-log model and this
-model."
+cap12 <- "Comparison of estimates and upper and lower $95\\%$ 
+confidence limits, between the preferred betabinomial 
+complementary log-log model (BB) and the gaussian error model."
 ```
 
 ```{r BBvsGauss, out.width="100%",  message=FALSE, echo=FALSE}
 cfLTs <- cbind(LTbb.cll, LTgauss.cll)
-colnames(cfLTs) <- c(rep('bb',3),rep('gauss',3))
+colnames(cfLTs) <- c(rep('BB',3),rep('gauss',3))
 tab <- round(cfLTs[,c(c(1,4),c(1,4)+1,c(1,4)+2)],1)
-if(require(kableExtra)){
-linesep <- c('', '\\addlinespace') 
-knitr::kable(tab, booktabs=TRUE, linesep=linesep, format='latex', caption=cap12, 
-             format.args=list(justify="right", width=9)) |>
-  kable_styling(latex_options = "striped", stripe_index = 5:8, font_size=9, full_width=FALSE) |>
-  column_spec(6:7, bold=TRUE) %>%
-  add_header_above(c(' '=1,'Estimate'=2,'Lower'=2, 'Upper'=2), align='r') 
+pcheck <- suppressWarnings(requireNamespace("kableExtra", quietly = TRUE))
+if(pcheck) pcheck & packageVersion("kableExtra") >= "1.2"
+if(pcheck){
+kableExtra::kbl(tab, font_size=9, caption=cap12) |>
+  kableExtra::kable_paper("striped", full_width=FALSE) |>
+  kableExtra::column_spec(6:7, bold=TRUE) |>
+  kableExtra::row_spec(5:8, color='blue', bold=T) |>
+  kableExtra::add_header_above(c(' '=1,'Estimate'=2,'Lower'=2, 'Upper'=2), align='c') 
 } else print(tab)
 ```
 
