@@ -38,7 +38,7 @@ if(pcheck) pcheck & packageVersion("glmmTMB") >= "1.1.2"
 if(!pcheck){
   message("`glmmTMB` version >= 1.1.2 is not available")
   message("Will not continue execution of vignette")
-  knit_exit()
+  knitr::knit_exit()
   }
 
 ## ----glmmTMB-altFits, message=FALSE, warning=FALSE, echo=FALSE----------------

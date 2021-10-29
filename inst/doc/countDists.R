@@ -23,8 +23,8 @@ theme <- list(axis.line = list(alpha = 1, col = 'gray40',
 if("lme4" %in% (.packages()))
   detach("package:lme4", unload=TRUE)
 req_suggested_packages <- c("gamlss")
-noneMiss <- suppressMessages(requireNamespace('gamlss', quietly = TRUE))
-nogamlss <- !noneMiss
+PKGgamlss <- suppressMessages(require('gamlss', quietly = TRUE))
+nogamlss <- !PKGgamlss
 if (nogamlss) {
    message("This vignette requires the `gamlss` package, that is not available/installed.")
 message("Code that requires this package will not be executed.")
@@ -35,7 +35,6 @@ op <- options(width=90)
 knitr::opts_chunk$set(
   collapse = TRUE
 )
-
 
 ## ----binom-dp, echo=FALSE---------------------------------------------------------------
 binom <- rbind(
@@ -111,9 +110,6 @@ wtd.var <- function(number,w){
 ## ----gamlss-check, echo=FALSE, eval=nogamlss--------------------------------------------
 #  message("Subsequent code that requires `gamlss` will not be executed.")
 
-## ----gamlss, echo=FALSE-----------------------------------------------------------------
-PKGgamlss <- suppressPackageStartupMessages(require(gamlss))
-
 ## ----cap2, echo=FALSE-------------------------------------------------------------------
 cap2 <- "Panel A compares the double binomial (DBI) and the 
 betabinomial (BB) distribution with the dispersion parameter
@@ -125,7 +121,7 @@ The binomial distribution ($\\Phi$ = 1), is shown for comparison,
 in both panels.  As $\\Phi$ increases, the change in shape needed
 to accomodate the increased variance becomes more extreme."  
 
-## ----cfDBI-BB, fig.width=9, fig.height=4, echo=FALSE, out.width='95%', fig.show='hold', fig.cap=cap2, eval=noneMiss----
+## ----cfDBI-BB, fig.width=9, fig.height=4, echo=FALSE, out.width='95%', fig.show='hold', fig.cap=cap2, eval=PKGgamlss----
 if(PKGgamlss){
 x <- 0:10
 denBI <- dBI(x, mu=.5, bd=10)
@@ -282,7 +278,7 @@ tastab
 #  tastab <- table(factor(qra::rayBlight, levels=0:6),
 #                  dnn=list("B: Frequency of each of 0 to 6, in 6 plants"))
 
-## ----cfFits, message=FALSE, echo=TRUE, eval=noneMiss------------------------------------
+## ----cfFits, message=FALSE, echo=TRUE, eval=PKGgamlss-----------------------------------
 library(gamlss)
 doBI <- gamlss(cbind(number, 6-number)~1, weights=freq,
                family=BI, data=diseased, trace=FALSE)
@@ -298,7 +294,7 @@ fitted to the plant disease data.
 Panel B (a 'worm plot') is a detrended version of Panel A,
 with the dotted curves marking out 95% confidence bounds."
 
-## ----cfsim, out.width='98%', fig.width=7.0, fig.height=2.25, echo=FALSE, fig.show='hold', fig.cap=cap4, eval=noneMiss----
+## ----cfsim, out.width='98%', fig.width=7.0, fig.height=2.25, echo=FALSE, fig.show='hold', fig.cap=cap4, eval=PKGgamlss----
 oldpar <- par(mar=c(2.6,4.1,2.6,1.6), mgp=c(2.5,.75,0), mfrow=c(1,3))
 ## Binomial fits
 rqres.plot(doBI, plot.type='all', type="QQ")
@@ -313,7 +309,7 @@ par(oldpar)
 cap5 <- "Diagnostic plots of randomized quantile residuals, for
 a __betabinomial__ model fitted to the plant disease data."
 
-## ----cfq2,  out.width='98%', fig.width=7.0, fig.height=2.25, echo=FALSE, fig.show='hold', fig.cap=cap5, eval=noneMiss----
+## ----cfq2,  out.width='98%', fig.width=7.0, fig.height=2.25, echo=FALSE, fig.show='hold', fig.cap=cap5, eval=PKGgamlss----
 oldpar <- par(mar=c(2.6,4.1,2.6,1.6), mgp=c(2.5,.75,0), mfrow=c(1,3))
 ## Betabinomial fits
 rqres.plot(doBB, plot.type='all', type="QQ")
@@ -344,7 +340,7 @@ par(oldpar)
 #  mtext(side=3, line=0.5, "C: Density plot", adj=0, cex=0.85)
 #  par(oldpar)
 
-## ----cf-AIC, eval=noneMiss--------------------------------------------------------------
+## ----cf-AIC, eval=PKGgamlss-------------------------------------------------------------
 aicStat <- AIC(doBI,doBB,doDBI)
 newnames <- c(doBI="Binomial", doBB="Betabinomial", doDBI="Double binomial")
 rownames(aicStat) <- as.vector(newnames[rownames(aicStat)])
@@ -356,7 +352,7 @@ maleDF <- qra::malesINfirst12
 ## Numbers of male children, out of 12
 as.table(setNames(maleDF$freq, nm=0:12))
 
-## ----cfMales, echo=1:2, eval=noneMiss---------------------------------------------------
+## ----cfMales, echo=1:2, eval=PKGgamlss--------------------------------------------------
 if(PKGgamlss){
 doBI <- gamlss(cbind(No_of_Males, 12-No_of_Males)~1, weights=freq,
                family=BI, data=maleDF, trace=FALSE)
@@ -366,7 +362,7 @@ doDBI <- gamlss(cbind(No_of_Males, 12-No_of_Males)~1, weights=freq,
                        family=DBI, data=maleDF, trace=FALSE, n.cyc=100)
 }
 
-## ----binFitProbs, echo=1:3, eval=noneMiss-----------------------------------------------
+## ----binFitProbs, echo=1:3, eval=PKGgamlss----------------------------------------------
 if(PKGgamlss){
 maleDF$BBfit <- with(maleDF, dBB(No_of_Males, bd=12,
                                  mu = fv(doBB, 'mu')[1],
@@ -384,7 +380,7 @@ maleDF$DBIfit <- with(maleDF, dBB(No_of_Males, bd=12,
 ## ----cap6, echo=FALSE-------------------------------------------------------------------
 cap6 <- "Data, from hospital records in Saxony in the nineteenth century, gave the number of males among the first 12 children in families of size 13, in 6115 families. Panel A shows a worm plot for the model that fitted a binomial distribution.  Panel B repeats the worm plot, now for the model that fitted a betabinomial distribution."
 
-## ----rqmales, out.width='85%', fig.width=8.4, fig.height=3.1, echo=FALSE,  fig.show='hold', fig.cap=cap6, eval=noneMiss----
+## ----rqmales, out.width='85%', fig.width=8.4, fig.height=3.1, echo=FALSE,  fig.show='hold', fig.cap=cap6, eval=PKGgamlss----
 if(PKGgamlss){
 oldpar <- par(mar=c(2.6,4.1,2.6,1.6), mgp=c(2.5,.75,0), mfrow=c(1,2))
 rqres.plot(doBI, plot.type='all', type="wp", main="")
@@ -404,7 +400,7 @@ par(oldpar)
 #  par(oldpar)
 #  } else message("Package `gamlss` is not available")
 
-## ----cf-AIC-males, echo=FALSE, eval=noneMiss--------------------------------------------
+## ----cf-AIC-males, echo=FALSE, eval=PKGgamlss-------------------------------------------
 if(PKGgamlss){
 aicStat <- AIC(doBI, doBB, doDBI)
 rownames(aicStat) <-
@@ -419,17 +415,9 @@ aicStat$dAIC <- with(aicStat, round(AIC-AIC[1],1))
 aicStat
 
 ## ----countdata, eval=TRUE, echo=FALSE---------------------------------------------------
-pkgVGAM <- requireNamespace("VGAM")
-if(pkgVGAM){
-## Radioactive count data
-ruge <- VGAM::ruge
-## Machinist accidents
-machinists <- VGAM::machinists
-} else {
 ruge <- data.frame(counts=c(57,203,383,525,532,408,273,139,45,27,10,4,0,1,1),
                    number=0:14)
 machinists <- data.frame(accidents=c(0:6,8), ofreq=c(296,74,26,8,4,4,1,1))
-}
 
 ## ----ruge, echo=F-----------------------------------------------------------------------
 ## Numbers of scintillations in 2608 1/8 minute intervals
@@ -518,7 +506,7 @@ aicStat
 cap8 <- "Worm plots for the Poisson, for the zero-inflated Poisson,
 and for the negative binomial."
 
-## ----wormpois, out.width='99%', fig.width=8.0, fig.height=2.5, echo=FALSE, fig.show='hold', fig.cap=cap8----
+## ----wormpois, out.width='99%', fig.width=8.0, fig.height=2.5, echo=FALSE, fig.show='hold', fig.cap=cap8, eval=PKGgamlss----
 if(PKGgamlss){
 oldpar <- par(mar=c(2.6,4.1,2.6,1.6), mgp=c(2.5,.75,0), mfrow=c(1,3))
 rqres.plot(dopoiss, plot.type='all', type="wp")
