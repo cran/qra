@@ -30,7 +30,7 @@ if (nogamlss) {
 message("Code that requires this package will not be executed.")
 }
 
-## ---- include = FALSE-------------------------------------------------------------------
+## ----include = FALSE--------------------------------------------------------------------
 op <- options(width=90)
 knitr::opts_chunk$set(
   collapse = TRUE

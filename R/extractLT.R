@@ -41,8 +41,8 @@
 #'
 #' @return Matrix holding LD or LD estimates.
 #' @examples
-#' pcheck <- suppressWarnings(requireNamespace("glmmTMB", quietly = TRUE))
-#' if(pcheck) pcheck & packageVersion("glmmTMB") >= "1.1.2"
+#' pcheck <- suppressWarnings(requireNamespace("glmmTMB", quietly = TRUE) &&
+#'                            packageVersion("glmmTMB") >= "1.1.2")
 #' if(pcheck){
 #' form <- cbind(Dead,Live)~0+trtGp/TrtTime+(1|trtGpRep)
 #' HawMed <- droplevels(subset(HawCon, CN=="MedFly"&LifestageTrt!="Egg"))
@@ -81,11 +81,11 @@ extractLT <-
     if(is.null(df.t))df.t <- summary(obj)$df.residual
     bfun <- coef
     varfun <- vcov
-  } else if(class(obj)%in%c("lmerMod","glmerMod")) {
+  } else if(inherits(obj, "merMod")) {
     ngrps <- summary(obj)$ngrps
     bfun <- fixef
     varfun <- vcov
-  } else if(class(obj)=="glmmTMB") {
+  } else if (inherits(obj, "glmmTMB")) {
     ngrps <- summary(obj)$ngrps[['cond']]
     bfun <- function(x)fixef(x)[["cond"]]
     varfun <- function(x)vcov(x)[["cond"]]

@@ -339,10 +339,11 @@ shorten <- function(nam, leaveout=c('trtGp','Fly',':')){
   nam
 }
 
-## ----crude-cll, echo=FALSE, warning=F-----------------------------------------
+## ----crude-cll, echo=FALSE, warning=FALSE-------------------------------------
 ## Fit two simplistic and unsatisfactory models.
 HCbbDisp1.cll <- update(HCbb.cll, dispformula=~1)
-HCbin.cll <- update(HCbb.cll, family=binomial(link="cloglog"))
+HCbin.cll <- update(HCbb.cll, family=binomial(link="cloglog"),
+                    dispformula = ~1)
 
 ## ----extract-BB-LTcll, echo=FALSE---------------------------------------------
 LTbb.cll <- qra::extractLT(p=0.99, obj=HCbb.cll, link="cloglog",
